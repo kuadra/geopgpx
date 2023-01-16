@@ -69,7 +69,7 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 
 let o;
 rust.then(m => {
-  o = m.work2(gpx);
+  o = m.get_points_from_gpx(gpx);
   map.setView([o[0].y, o[0].x], 13);
   var latLngPoints = [];
   o.forEach(point => {

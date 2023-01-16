@@ -3,11 +3,6 @@
 // will work here one day as well!
 const rust = import('./pkg');
 
-const point = {
-  "x": 51.505,
-  "y": -0.09
-}
-
 const gpx = "<?xml version='1.0' encoding='UTF-8'?>\
 <gpx version=\"1.1\" creator=\"https://www.komoot.de\" xmlns=\"http://www.topografix.com/GPX/1/1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd\">\
   <metadata>\
@@ -72,14 +67,12 @@ const gpx = "<?xml version='1.0' encoding='UTF-8'?>\
 //   map.off(); map.remove();
 // }
 
-var container = L.DomUtil.get('map');
-      if(container != null){
-        container._leaflet_id = null;
-      }
+// var container = L.DomUtil.get('map');
+// if (container != null) {
+//   container._leaflet_id = null;
+// }
 
-var map = L.map('map')
-
-map = L.map('map').setView([51.505, -0.09], 13);
+var map = L.map('map').setView([51.505, -0.09], 13);
 
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
   maxZoom: 19,
@@ -94,9 +87,16 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 let o;
 
 rust.then(m => {
-  var marker1 = L.marker([point.x, point.y]).addTo(map);
-  o = m.work(point); console.log("output: ", o);
-  var marker2 = L.marker([o.x, o.y]).addTo(map);
+  o = m.work2(gpx);
+  console.log("output: ", o);
+  map.setView([o[0].y, o[0].x], 13);
+  var latLngPoints = [];
+  o.forEach(point => {
+    var latLng = L.latLng(point.y, point.x);
+    console.log("Adding: ", point);
+    latLngPoints.push(latLng)
+  })
+  L.polyline(latLngPoints, { color: 'red' }).addTo(map);
 })
 
 

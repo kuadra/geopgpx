@@ -1,5 +1,9 @@
+use gpx::errors::GpxError;
+use gpx::read;
+use gpx::Gpx;
+use serde::{Deserialize, Serialize};
+use std::io::BufReader;
 use wasm_bindgen::prelude::*;
-use serde::{Serialize, Deserialize};
 
 #[wasm_bindgen]
 extern "C" {
@@ -39,11 +43,10 @@ pub fn write_json_to_console(name: JsValue) {
 //     }
 // }
 
-
 #[derive(Serialize, Deserialize, Debug)]
 pub struct GpxData {
-    x : f64,
-    y : f64
+    x: f64,
+    y: f64,
 }
 
 // #[wasm_bindgen]
@@ -57,13 +60,16 @@ pub fn read_gpx_json(val: JsValue) -> Result<(), JsValue> {
     let example: GpxData = serde_wasm_bindgen::from_value(val)?;
     /* …do something with `example`… */
     write_to_console(format!("{:?}", example).as_str());
-    let p =crunch_data(example);
+    let p = crunch_data(example);
     write_to_console(format!("{:?}", p).as_str());
     Ok(())
 }
 
-fn crunch_data(input : GpxData) -> GpxData{
-    let o = GpxData{x : input.x+5.0, y : input.y};
+fn crunch_data(input: GpxData) -> GpxData {
+    let o = GpxData {
+        x: input.x + 5.0,
+        y: input.y,
+    };
     return o;
 }
 
@@ -71,8 +77,22 @@ fn crunch_data(input : GpxData) -> GpxData{
 pub fn work(val: JsValue) -> Result<JsValue, serde_wasm_bindgen::Error> {
     let example: GpxData = serde_wasm_bindgen::from_value(val)?;
     write_to_console(format!("input: {:?}", example).as_str());
-    let p =crunch_data(example);
+    let p = crunch_data(example);
     let p_json = serde_wasm_bindgen::to_value(&p);
     write_to_console(format!("{:?}", p).as_str());
     p_json
+}
+
+#[wasm_bindgen]
+pub fn work2(val: String) -> Vec<JsValue> {
+    let data = BufReader::new(val.as_bytes());
+    let gpx: Result<Gpx, GpxError> = read(data);
+
+    let mut out = Vec::<JsValue>::new();
+    for p in &gpx.unwrap().tracks[0].segments[0].points {
+        let k = serde_wasm_bindgen::to_value(&p.point());
+        out.push(k.unwrap());
+    }
+    write_to_console(format!("rustout: {:?}", out).as_str());
+    return out;
 }

@@ -61,34 +61,15 @@ const gpx = "<?xml version='1.0' encoding='UTF-8'?>\
   </trk>\
 </gpx>"
 
-
-// var map = document.getElementById('map');
-// if (map) {
-//   map.off(); map.remove();
-// }
-
-// var container = L.DomUtil.get('map');
-// if (container != null) {
-//   container._leaflet_id = null;
-// }
-
-var map = L.map('map').setView([51.505, -0.09], 13);
-
+var map = L.map('map').setView([0, 0], 13);
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
   maxZoom: 19,
   attribution: '&copy; <a href=\"http://www.openstreetmap.org/copyright\">OpenStreetMap</a>'
 }).addTo(map);
 
-
-
-// rust
-//   .then(m => m.read_gpx_json(point))
-//   .catch(console.error);
 let o;
-
 rust.then(m => {
   o = m.work2(gpx);
-  console.log("output: ", o);
   map.setView([o[0].y, o[0].x], 13);
   var latLngPoints = [];
   o.forEach(point => {

@@ -63,11 +63,16 @@ pub fn read_gpx_json(val: JsValue) -> Result<(), JsValue> {
 }
 
 fn crunch_data(input : GpxData) -> GpxData{
-    let o = GpxData{x : input.x+input.x, y : input.y};
+    let o = GpxData{x : input.x+5.0, y : input.y};
     return o;
 }
 
 #[wasm_bindgen]
-pub fn test_log(i : &str) {
-    write_to_console(i)
+pub fn work(val: JsValue) -> Result<JsValue, serde_wasm_bindgen::Error> {
+    let example: GpxData = serde_wasm_bindgen::from_value(val)?;
+    write_to_console(format!("input: {:?}", example).as_str());
+    let p =crunch_data(example);
+    let p_json = serde_wasm_bindgen::to_value(&p);
+    write_to_console(format!("{:?}", p).as_str());
+    p_json
 }
